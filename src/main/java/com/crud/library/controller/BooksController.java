@@ -2,8 +2,10 @@ package com.crud.library.controller;
 
 import com.crud.library.domain.BookDto;
 import com.crud.library.exceptions.NoSuchBookException;
+import com.crud.library.exceptions.NoSuchTitleException;
 import com.crud.library.mapper.BookMapper;
 import com.crud.library.service.DbBookService;
+import com.crud.library.service.DbTitleService;
 import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +20,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class BooksController {
 
     @Autowired
-    DbBookService service;
+    private DbBookService service;
 
     @Autowired
-    BookMapper mapper;
+    private DbTitleService titleService;
+
+    @Autowired
+    private BookMapper mapper;
 
     @RequestMapping(method = RequestMethod.GET, value = "getBooks")
     public List<BookDto> getBooks() {
@@ -34,8 +39,12 @@ public class BooksController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "addBook", consumes = APPLICATION_JSON_VALUE)
-    public void addBook(@RequestBody BookDto bookDto) {
-        service.addBook(mapper.mapToBook(bookDto));
+    public void addBook(@RequestBody BookDto bookDto) throws NoSuchTitleException {
+        if (titleService.findById(bookDto.getTitleId()).isPresent()) {
+            service.addBook(mapper.mapToBook(bookDto));
+        } else {
+            throw new NoSuchTitleException("There isn't any title of this TITLE_ID, check database - entity TITLES");
+        }
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "deleteBook")

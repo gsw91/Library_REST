@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DbTitleService {
@@ -15,6 +16,10 @@ public class DbTitleService {
 
     public List<Title> findAll() {
         return titleRepository.findAll();
+    }
+
+    public Optional<Title> findById(Long id) {
+        return titleRepository.findById(id);
     }
 
     public Title addTitle(Title title) {
